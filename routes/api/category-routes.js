@@ -1,14 +1,12 @@
 const router = require('express').Router();
-const { defaultMaxListeners } = require('mysql2/typings/mysql/lib/Connection');
 const { Category, Product } = require('../../models');
 
 // The `/api/categories` endpoint
 
+// find all categories
 router.get('/', async (req, res) => {
-  // find all categories
   try {
     const categoryData = await Category.findAll({
-      // be sure to include its associated Products
       include: [{ model: Product }],
     });
     res.status(200).json(categoryData);
@@ -17,12 +15,11 @@ router.get('/', async (req, res) => {
   }
 });
 
+// find one category by its `id` value
 router.get('/:id', async (req, res) => {
-  // find one category by its `id` value
   try {
     const categoryData = await Category.findByPk(req.params.id, {
       where: { category_id: req.body.category_id },
-      // be sure to include its associated Products
       include: { model: Product },
     });
     if (!categoryData) {
@@ -35,23 +32,24 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// create a new category
 router.post('/', (req, res) => {
-  // create a new category
   Category.create(
     {
       category_name: req.body.category_name,
     },
   )
-    .then(categoryData => res.json(categoryData)
-    )
+    .then((categoryData) => {
+      res.status(200).json(categoryData)
+    })
     .catch(err => {
       console.log(err);
       res.status(500).json(err);
     });
 });
 
+// update a category by its `id` value
 router.put('/:id', (req, res) => {
-  // update a category by its `id` value
   Category.update(
     {
       category_name: req.body.name,
@@ -62,20 +60,20 @@ router.put('/:id', (req, res) => {
       },
     })
     .then((updatedCategory) => {
-      res.json(updatedCategory);
+      res.status(200).json(updatedCategory);
     })
     .catch((err) => res.status(500).json(err));
 });
 
+// delete a category by its `id` value
 router.delete('/:id', (req, res) => {
-  // delete a category by its `id` value
   Category.destroy({
     where: {
       category_id: req.params.category_id,
     },
   })
     .then((deletedCategory) => {
-      res.json(deleted);
+      res.json(deletedCategory);
     })
     .catch((err) => res.json(err));
 });
